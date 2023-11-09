@@ -1,3 +1,5 @@
+// Author: Eric AhSue
+
 //This file is for documentation purposes only. It will be ignored by the compiler.
 //Our Teaching Assistant will manually grade this file.
 
