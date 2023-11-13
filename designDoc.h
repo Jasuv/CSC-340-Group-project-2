@@ -64,6 +64,7 @@ You are going to include the following function prototypes in this header file
 
     1. sentenceSplitter.
         void sentenceSplitter( string& fname, vector<string>& sentences);
+        
         This function converts a text file with the name fname into a list of sentences. 
         The list of sentences will be stored in the sentences vector in the same order as it appears in the input file.
 
@@ -161,8 +162,7 @@ You are going to include the following function prototypes in this header file
 
     3. flip the map of to a multimap of to order all the word-pairs in ascending order of frequency
     
-        void freqWordpairMmap(map< pair<string,string>, int> &wordpairFreq_map, multimap<int, 
-                              pair<string, string> > &freqWordpair_mmap );
+        void freqWordpairMmap(map< pair<string,string>, int> &wordpairFreq_map, multimap<int, pair<string, string> > &freqWordpair_mmap );
 
         This function flips the wordpairFreq_map such that frequencies will be the keys and word-pairs will be the values. 
         A multimap will be needed as two word-pairs can have the same frequency.
@@ -177,8 +177,7 @@ You are going to include the following function prototypes in this header file
 
     4. output the most frequent and least frequent word-pairs to a file.
 
-        void printWordpairs(multimap<int, pair<string, string> > &freqWordpair_multimap, string outFname, 
-        int topCnt, int botCnt);
+        void printWordpairs(multimap<int, pair<string, string> > &freqWordpair_multimap, string outFname, int topCnt, int botCnt);
 
         This function writes the top topCnt most frequent word-pairs and botCnt least frequent word-pairs 
         to a file of the name outFname. Note that all the word-pairs are already ordered in ascending order of frequency. 

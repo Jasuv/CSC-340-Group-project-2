@@ -4,17 +4,38 @@
 
 namespace fileIOs {
     /*
-    open file "fname"
-    if file opened
-        read each line in the file until '.' delimiter
-            add line to the sentences vector
-        end reading
-        close the file
-    else
-        display an error message
-    end if
+    // Split sentences in a file and store them in a vector
+    // listSentences: Vector of sentences from the file
+    // resultingPairs: Empty map to store resulting word pairs and their frequencies
+    function sentenceSplitter(fname, sentences):
+        // Declare variables
+        ifstream inFS
+        string sentence
+
+        // Open the file
+        inFS.open(fname)
+
+        // Check if the file is open
+        if inFS.is_open:
+            // Read each sentence in the file
+            while (getline(inFS, sentence, '.')):
+                stringstream ss(sentence)
+
+                // Split each sentence by '?'
+                while (getline(ss, sentence, '?')):
+                    // Add the sentence to the vector
+                    append(sentences, sentence)
+            else:
+                print "Couldn't open the file..."
+
+        // Close the file
+        inFS.close()
+        return sentences
     */
-    void sentenceSplitter(string &fname, vector<string> &sentences) {
+    // used the suggested answer on this post how to use getline and multiple delimiters,
+    // this is assuming '.' '?' '\n' are the only delimiters.
+    // https://stackoverflow.com/questions/37957080/can-i-use-2-or-more-delimiters-in-c-function-getline#:~:text=std%3A%3Agetline()%20does,%2C%20into%20comma%2Dseparate%20values.
+    void FileIOs::sentenceSplitter(string &fname, vector<string> &sentences) {
         ifstream inFS;
         string sentence;
 
@@ -22,132 +43,153 @@ namespace fileIOs {
 
         if (inFS.is_open()) {
             while (getline(inFS, sentence, '.')) {
-                sentences.push_back(sentence);
+                stringstream ss(sentence);
+                while (getline(ss, sentence, '?')) {
+                    sentences.push_back(sentence);
+                }
             }
         } else {
             cout << "Couldn't open the file..." << endl;
         }
-
         inFS.close();
     }
     /*
-    for each sentence in sentences do
-        create an input string stream 'iss' from the sentence
-        create an empty string 'prevWord'
+    // Generate word pairs and their frequencies
+    // sentences: Vector of input sentences
+    // wordpairFreq_map: Map to store resulting word pairs and their frequencies
+    function wordpairMapping(sentences, wordpairFreq_map):
+        // For each sentence in the input vector
+        for each sentence in sentences:
+            // Tokenize the sentence using istringstream
+            stringstream iss(sentence)
+            vector<string> uniqueTokens
 
-        while able to extract 'word' from iss do
-            create a word-pair 'wordPair' from 'prevWord' and 'word'
-            increment the frequency count of 'wordPair' in 'wordpairFreq_map'
-            set 'prevWord' as 'word' for the next pair
-        end while
-    end for
+            // For each token in the sentence
+            while (iss >> token):
+                // Convert the token to lowercase
+                toLower(token) -> token
+
+                // Check if the token is already in the uniqueTokens vector
+                search(uniqueTokens, token) -> it
+                if it not found:
+                    // Token is not in the vector, so add it
+                    append(uniqueTokens, token)
+
+            // Generate word-pairs and update their frequency in the map
+            len(uniqueTokens) -> len
+            for i = 1 to len - 1:
+                for j = i + 1 to len:
+                    // Arrange the two words in lexicographical order
+                    make_a_pair(uniqueTokens[i], uniqueTokens[j]) -> pair
+                    // Increment the frequency of the word-pair in the map
+                    incrementFreq(wordpairFreq_map[pair], 1)
+
+        return wordpairFreq_map
     */
-    void wordpairMapping(vector<string> &sentences, map<pair<string, string>, int> &wordpairFreq_map) {
-        auto tokenizeAndLower = [](const string& sentence) {
+    void FileIOs::wordpairMapping(vector<string> &sentences, map<pair<string, string>, int> &wordpairFreq_map) {
+        for (const auto &sentence : sentences) {
             istringstream iss(sentence);
-            vector<string> tokens;
-            string token;
+            vector<string> uniqueTokens;
 
+            string token;
             while (iss >> token) {
+                // convert the token to lowercase
                 transform(token.begin(), token.end(), token.begin(), ::tolower);
-                tokens.push_back(token);
+
+                // check if the token is already in the uniqueTokens vector
+                auto it = find(uniqueTokens.begin(), uniqueTokens.end(), token);
+                if (it == uniqueTokens.end()) {
+                    uniqueTokens.push_back(token);
+                }
             }
 
-            sort(tokens.begin(), tokens.end());
-            tokens.erase(unique(tokens.begin(), tokens.end()), tokens.end());
-
-            return tokens;
-        };
-
-        for (const auto& sentence : sentences) {
-            vector<string> uniqueTokens = tokenizeAndLower(sentence);
-            int len = uniqueTokens.size();
-
-            for (int i = 0; i < len - 1; ++i) {
-                for (int j = i + 1; j < len; ++j) {
-                    pair<string, string> wordPair = make_pair(uniqueTokens[i], uniqueTokens[j]);
-                    auto it = wordpairFreq_map.find(wordPair);
-
-                    if (it != wordpairFreq_map.end()) {
-                        it->second++;
-                    } else {
-                        wordpairFreq_map[wordPair] = 1;
+            for (size_t i = 0; i < uniqueTokens.size(); ++i) {
+                for (size_t j = i + 1; j < uniqueTokens.size(); ++j) {
+                    // arrange the two words in lexicographical order
+                    string word1 = uniqueTokens[i];
+                    string word2 = uniqueTokens[j];
+                    if (word1 > word2) {
+                        swap(word1, word2);
                     }
+                    wordpairFreq_map[{word1, word2}]++;
                 }
             }
         }
     }
     /*
-    for each pairFreq in wordpairFreq_map do
-        insert pairFreq's value as a key and pairFreq's key as a value into freqWordpair_mmap
-    end for
+    // Generate a multimap of word pair frequencies
+    // wordpairFreq_map: Map of word pairs and their frequencies
+    // freqWordpair_mmap: Multimap to store frequencies and corresponding word pairs
+    function freqWordpairMmap(wordpairFreq_map, freqWordpair_mmap):
+        // For each pair and frequency in the input map
+        for each pairFreq in wordpairFreq_map:
+            // Insert the frequency and word pair into the multimap
+            insert(freqWordpair_mmap, make_pair(pairFreq.second, pairFreq.first))
+
+        return freqWordpair_mmap
     */
-    void freqWordpairMmap(map<pair<string, string>, int> &wordpairFreq_map, multimap<int, pair<string, string>> &freqWordpair_mmap) {
+    void FileIOs::freqWordpairMmap(map<pair<string, string>, int> &wordpairFreq_map, multimap<int, pair<string, string>> &freqWordpair_mmap) {
         for (const auto &pairFreq : wordpairFreq_map) {
             freqWordpair_mmap.insert(std::make_pair(pairFreq.second, pairFreq.first));
         }
     }
     /*
-    open outputFile named outFname
+    // Print top and bottom word pairs with their frequencies to a file
+    // freqWordpair_multimap: Multimap of word pairs and their frequencies
+    // outFname: Output file name
+    // topCnt: Number of top most frequent word pairs to print
+    // botCnt: Number of bottom least frequent word pairs to print
+    function printWordpairs(freqWordpair_multimap, outFname, topCnt, botCnt):
+        // Declare variables
+        ofstream outFS
 
-    if outputFile cannot be opened then
-        display an error message
-        return
-    end if
+        // Open the output file
+        outFS.open(outFname)
 
-    count = 0
-    for each word-pair in freqWordpair_multimap by frequency in descending order do
-        if count is less than topCnt then
-            write the word-pair and its frequency to outputFile
-            increment count
-        end if
-    end for
+        // Check if the file is open
+        if outFS.is_open:
+            int count = 0
 
-    count = 0
-    for each word-pair in freqWordpair_multimap by frequency in ascending order do
-        if count is less than botCnt then
-            write the word-pair and its frequency to outputFile
-            increment count
-        end if
-    end for
+            // Write the top most frequent word-pairs to the file
+            for each it in reverse order of freqWordpair_multimap and while count < topCnt:
+                outFS << "<" << it->second.first << ", " << it->second.second << ">: " << it->first << endl
+                count++
 
-    close outputFile
+            count = 0
+
+            // Write the bottom least frequent word-pairs to the file
+            for each it in order of freqWordpair_multimap and while count < botCnt:
+                outFS << "<" << it->second.first << ", " << it->second.second << ">: " << it->first << endl
+                count++
+
+        Else:
+            Print "Couldn't open the file..."
+
+        // Close the output file
+        outFS.close()
     */
-    void printWordpairs(multimap<int, pair<string, string>> &freqWordpair_multimap, string outFname, int topCnt, int botCnt) {
+    void FileIOs::printWordpairs(multimap<int, pair<string, string>> &freqWordpair_multimap, string outFname, int topCnt, int botCnt) {
         ofstream outFS;
         outFS.open(outFname);
 
         if (outFS.is_open()) {
             int count = 0;
-            // Write the top most frequent word-pairs to the file
+            // write the top most frequent word-pairs to the file
             for (auto it = freqWordpair_multimap.rbegin(); it != freqWordpair_multimap.rend() && count < topCnt; ++it) {
                 outFS << "<" << it->second.first << ", " << it->second.second << ">: " << it->first << std::endl;
                 count++;
             }
 
             count = 0;
-            // Write the bottom least frequent word-pairs to the file
+            // write the bottom least frequent word-pairs to the file
             for (auto it = freqWordpair_multimap.begin(); it != freqWordpair_multimap.end() && count < botCnt; ++it) {
                 outFS << "<" << it->second.first << ", " << it->second.second << ">: " << it->first << std::endl;
                 count++;
             }
-            /*
-            auto it = freqWordpair_multimap.begin(); // Start at the beginning of the word-pair list
-
-            while (count < botCnt) {                     // Keep going until we've written 'botCnt' word-pairs
-                if (it == freqWordpair_multimap.end()) { // If we reach the end, stop
-                    break;
-                }
-                outputFile << "<" << it->second.first << ", " << it->second.second << ">: " << it->first << std::endl; // Write the word-pair to the file
-                count++;                                                                                               // Move to the next word-pair
-                it++;                                                                                                  // Move to the next word-pair in the list
-            }
-            */
 
         } else {
             cout << "Couldn't open the file..." << endl;
         }
-
         outFS.close();
     }
 } // namespace fileIOs
