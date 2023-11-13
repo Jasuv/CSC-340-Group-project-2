@@ -1,20 +1,47 @@
 // Author: Eric AhSue
 
-//This file is for documentation purposes only. It will be ignored by the compiler.
-//Our Teaching Assistant will manually grade this file.
-
-//Please make sure that you include the entire content of this file as comments.
-
 /* Design Doc: communicate your thought process in English.
  
 0. List of members who contributed to the implementation of this project:
    
+  Eric AhSue
+  
+1. What are the expected input and outputs of your file.
 
- 
-1. Describe your algorithm for the sentenceSplitter( ) function in pseudocode.
+  Input: textFile                     //file of plain text
+  Output: {<w1, 2w2>: freq(<w1, w2>)} //w1 & w2 are in lower case; w1<w2 they are lexicographically ordered
+                                      //w1 & w2 are required to be in the same sentence
+                                      //freq(<w1, w2>): number of sentences that contain this pair
 
+2. Describe your algorithm for the sentenceSplitter( ) function in pseudocode.
 
-2. Describe your algorithm for the wordpairMapping( ) function in pseudocode.
+    open(textFile) -> inFile //open input file
+    //split the files into sentences using the specified list of sentence delimiters
+    sentDilimiter = {'.','?',','...','\n'}
+    sentenceSpliter(inFile, sentDilimeter) -> listSentences //split files into sentences using the delimiter
+
+3. Describe your algorithm for the wordpairMapping( ) function in pseudocode.
+
+    //generate word pairs and their frequencies
+    resultingPairs {} //{<w1, w2>: freq(<w1, w2>)}
+    for each s in listSentences
+      toLower(s) -> s_l //convert to lower case
+      tokenize(s_l) -> listTokens //tokenize the sentence into tokens using whitespaces as delimiters
+        // e.g "the story is about connecting the dots" -> {the, story, is, about, connecting, the, dots}
+      sort(deDuplicate(listTokens)) -> listUniquTokens // remove duplicate tokens and sort them lexicographically
+        // e.g {the, story, is, about, connecting, the, dots} -> {about, connecting, dots, is, story, the}
+      length(ListUniqTokens) -> len
+      for i=1 to len-1
+        for j=i+1 to len
+          make_a_pair(listUniqTokens[i], listUniqTokens[j]) -> pair
+          //update the resultingPairs
+          search(resultingPairs, pair) -> isFound //searches for pair
+          if isFound
+            incrementFreq(pair, 1)
+          else
+            setFreq(pair, 1) -> <pair, 1>
+          update(resultingPairs, <pair, freq>) //either update the pair's freq or add it to its new pair
+    return resultingPairs
 
 
 

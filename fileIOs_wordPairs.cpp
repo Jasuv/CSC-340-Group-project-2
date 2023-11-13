@@ -43,18 +43,37 @@ namespace fileIOs {
     end for
     */
     void wordpairMapping(vector<string> &sentences, map<pair<string, string>, int> &wordpairFreq_map) {
-        for (const auto &sentence : sentences) {
+        auto tokenizeAndLower = [](const string& sentence) {
             istringstream iss(sentence);
-            string word, prevWord;
+            vector<string> tokens;
+            string token;
 
-            if (!(iss >> prevWord)) {
-                continue; // If there's no word in the sentence, move to the next sentence
+            while (iss >> token) {
+                transform(token.begin(), token.end(), token.begin(), ::tolower);
+                tokens.push_back(token);
             }
 
-            while (iss >> word) {
-                pair<string, string> wordPair = std::make_pair(prevWord, word);
-                wordpairFreq_map[wordPair]++; // Increment the frequency of the word-pair
-                prevWord = word;
+            sort(tokens.begin(), tokens.end());
+            tokens.erase(unique(tokens.begin(), tokens.end()), tokens.end());
+
+            return tokens;
+        };
+
+        for (const auto& sentence : sentences) {
+            vector<string> uniqueTokens = tokenizeAndLower(sentence);
+            int len = uniqueTokens.size();
+
+            for (int i = 0; i < len - 1; ++i) {
+                for (int j = i + 1; j < len; ++j) {
+                    pair<string, string> wordPair = make_pair(uniqueTokens[i], uniqueTokens[j]);
+                    auto it = wordpairFreq_map.find(wordPair);
+
+                    if (it != wordpairFreq_map.end()) {
+                        it->second++;
+                    } else {
+                        wordpairFreq_map[wordPair] = 1;
+                    }
+                }
             }
         }
     }
