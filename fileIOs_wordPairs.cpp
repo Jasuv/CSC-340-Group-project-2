@@ -92,7 +92,7 @@ namespace fileIOs {
             vector<string> uniqueTokens;
 
             string token;
-            while (iss >> token) {
+            while (getline(iss, token, ' ')) {
                 // convert the token to lowercase
                 transform(token.begin(), token.end(), token.begin(), ::tolower);
 

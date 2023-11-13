@@ -17,9 +17,9 @@ bool test_sentenceSplitter() {
     return sentences.size() == 12;
 }
 bool test_wordpairMapping() {
-    sentences = {"The first story is about connecting the dots.",
-                 "The first story is about connecting the dots.",
-                 "The first story is about connecting the dots."};
+    sentences = {"The first story is about connecting the dots",
+                 "The first story is about connecting the dots",
+                 "The first story is about connecting the dots"};
     fileios.wordpairMapping(sentences, wordpairFreq_map);
     return wordpairFreq_map.size() == 21;
 }
@@ -29,7 +29,7 @@ bool test_freqWordpairMmap() {
 }
 //TODO finish this
 bool test_printWordpairs() {
-    fileios.printWordpairs(freqWordpair_mmap, output, 1, 2);
+    fileios.printWordpairs(freqWordpair_mmap, output, 10, 0);
     return 0;
 }
 

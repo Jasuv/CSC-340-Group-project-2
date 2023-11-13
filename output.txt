@@ -1,3 +1,10 @@
 <story, the>: 3
-<about, connecting>: 3
-<about, dots.>: 3
+<is, the>: 3
+<is, story>: 3
+<first, the>: 3
+<first, story>: 3
+<first, is>: 3
+<dots, the>: 3
+<dots, story>: 3
+<dots, is>: 3
+<dots, first>: 3
